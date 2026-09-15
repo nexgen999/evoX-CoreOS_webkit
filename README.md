@@ -11,7 +11,7 @@ edit your ps5 dns :
 or
 - 45.56.67.85
 
-go to : https://nexgen999.github.io/ps5webkit from user guide
+go to : https://nexgen999.github.io/evoX-CoreOS_webkit from user guide
 
 project fork from :
 
