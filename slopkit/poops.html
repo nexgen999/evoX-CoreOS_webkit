@@ -28,88 +28,669 @@
     });
 })();
 </script>
-<title>W2JB</title>
+<title>PS5 WebKit evoX W2JB</title>
 <style>
-  html,body{margin:0;padding:0;background:#000;color:#b8c0cc;
-    font:14px/1.45 ui-monospace,Menlo,Consolas,monospace}
-  #deck{max-width:720px;margin:12px auto;padding:0 12px}
-  #stage{margin:8px 0;padding:8px 10px;border:1px solid #333;color:#e8eef6}
-  #stage.ok{border-color:#2a7;color:#7dffb2}
-  #stage.bad{border-color:#a33;color:#ff8a9a}
-  #liveStrip,#vitals,#cfg,#reboot,#verdict,#danger,#badge,#failureMessage{margin:6px 0;color:#8a93a3}
-  #failureMessage{display:none;color:#ff8a9a;font-weight:700}
-  #failureMessage.on{display:block}
-  #badge{display:none}#badge.on{display:block;color:#7dffb2}
-  #scr,#early{white-space:pre-wrap;word-break:break-word;font-size:12px;color:#7a8494;max-height:40vh;overflow:auto}
-  #payloadMenu{display:none;margin-top:12px}
-  #payloadMenu.on{display:block}
-  #payloadMenu .menuTitle{margin:0 0 8px;color:#9ab}
-  #payloadMenu .payloadTile{display:block;margin:6px 0;padding:10px;border:1px solid #333;
-    color:#dfe6f0;text-decoration:none}
-  #payloadMenu .payloadTile.busy{opacity:.4;pointer-events:none}
-  #payloadMenu .payloadTile[data-state="sending"]{border-color:#5af}
-  #payloadMenu .payloadTile[data-state="sent"]{border-color:#2a7;color:#7dffb2}
-  #payloadMenu .payloadTile[data-state="failed"]{border-color:#a33;color:#ff8a9a}
-  #payloadMenu .payloadTile img,.legacy,.stage-rail,#reactor,.field,.scan,.beam,.brand-row,#dt{display:none!important}
-  #retryInject{display:none;margin:10px 0;padding:10px 14px;background:#111;color:#ff8a9a;border:1px solid #a33}
-  #retryInject.on{display:inline-block}
-  .drawer-toggle{margin:8px 0;padding:6px 10px;background:#111;color:#9ab;border:1px solid #333}
-  #deepDrawer{display:none}#deepDrawer.on{display:block}
-  table{width:100%;border-collapse:collapse;font-size:12px}
-  th,td{border-bottom:1px solid #222;padding:4px 6px;text-align:left}
-  #arm{margin:12px 0;padding:10px;border:1px solid #333}
-  #nav a{display:inline-block;margin:4px 8px 4px 0;color:#7eb6ff}
+  :root {
+    --bg-primary: #070a12;
+    --bg-secondary: #0d121f;
+    --bg-card: rgba(16, 24, 40, 0.85);
+    --bg-card-hover: rgba(26, 38, 64, 0.95);
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-card: rgba(56, 189, 248, 0.18);
+    --ps-blue: #0070d1;
+    --ps-cyan: #38bdf8;
+    --ps-cyan-glow: rgba(56, 189, 248, 0.25);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --success: #10b981;
+    --success-glow: rgba(16, 185, 129, 0.25);
+    --danger: #f43f5e;
+    --danger-glow: rgba(244, 63, 94, 0.25);
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-primary);
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(0, 112, 209, 0.18) 0%, transparent 60%),
+      radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.08) 0%, transparent 40%);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #deck {
+    max-width: 820px;
+    margin: 24px auto;
+    padding: 0 18px 48px;
+  }
+
+  /* Brand Header */
+  .brand-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .brand-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .brand-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #000;
+    border: 1px solid var(--border-card);
+    box-shadow: 0 4px 16px var(--ps-cyan-glow);
+    object-fit: contain;
+  }
+
+  .brand-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--ps-cyan);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+  }
+
+  .brand-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .top-bar-badge {
+    font-size: 12px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    padding: 6px 12px;
+    background: rgba(13, 18, 31, 0.9);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    color: var(--ps-cyan);
+  }
+
+  /* Stage Pipeline Rail */
+  .stage-rail {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .stage-chip {
+    flex: 1;
+    min-width: 100px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: all 0.25s ease;
+  }
+
+  .stage-chip .chip-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    font-size: 10px;
+    color: var(--text-secondary);
+  }
+
+  .stage-chip.on {
+    background: rgba(0, 112, 209, 0.15);
+    border-color: var(--ps-cyan);
+    color: var(--text-primary);
+    box-shadow: 0 0 16px var(--ps-cyan-glow);
+  }
+
+  .stage-chip.on .chip-num {
+    background: var(--ps-cyan);
+    color: #000;
+    font-weight: 700;
+  }
+
+  .stage-chip.done {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--success);
+    color: #6ee7b7;
+  }
+
+  .stage-chip.done .chip-num {
+    background: var(--success);
+    color: #000;
+  }
+
+  .stage-chip.fail {
+    background: rgba(244, 63, 94, 0.1);
+    border-color: var(--danger);
+    color: #fda4af;
+  }
+
+  /* Stage Active Card */
+  #stage {
+    margin: 16px 0 10px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-left: 4px solid var(--ps-cyan);
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  #stage::before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--ps-cyan);
+    box-shadow: 0 0 10px var(--ps-cyan);
+  }
+
+  #stage.ok {
+    border-color: var(--success);
+    border-left-color: var(--success);
+    color: #a7f3d0;
+  }
+
+  #stage.ok::before {
+    background: var(--success);
+    box-shadow: 0 0 10px var(--success);
+  }
+
+  #stage.bad {
+    border-color: var(--danger);
+    border-left-color: var(--danger);
+    color: #fecdd3;
+  }
+
+  #stage.bad::before {
+    background: var(--danger);
+    box-shadow: 0 0 10px var(--danger);
+  }
+
+  /* Status Ticker */
+  #liveStrip {
+    margin: 6px 0 14px;
+    padding: 8px 14px;
+    background: rgba(13, 18, 31, 0.6);
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  #liveStrip .ok {
+    color: #34d399;
+  }
+
+  #liveStrip .hot {
+    color: var(--ps-cyan);
+  }
+
+  /* Status Badges & Alerts */
+  #badge {
+    display: none;
+    margin: 12px 0;
+    padding: 10px 16px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    color: #6ee7b7;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+
+  #badge.on {
+    display: block;
+    box-shadow: 0 0 20px var(--success-glow);
+  }
+
+  #failureMessage {
+    display: none;
+    margin: 16px 0;
+    padding: 14px 18px;
+    background: rgba(244, 63, 94, 0.12);
+    border: 1px solid var(--danger);
+    border-radius: 12px;
+    color: #fda4af;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  #failureMessage.on {
+    display: block;
+    box-shadow: 0 0 24px var(--danger-glow);
+  }
+
+  #vitals, #cfg, #reboot, #verdict, #danger {
+    margin: 6px 0;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  #danger {
+    color: #fca5a5;
+  }
+
+  #reboot.fine {
+    color: #34d399;
+  }
+
+  /* Retry Inject Button */
+  #retryInject {
+    display: none;
+    width: 100%;
+    margin: 14px 0;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px var(--danger-glow);
+  }
+
+  #retryInject.on {
+    display: block;
+  }
+
+  /* Payloads Menu */
+  #payloadMenu {
+    display: none;
+    margin-top: 24px;
+  }
+
+  #payloadMenu.on {
+    display: block;
+  }
+
+  .menuTitle {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .menuTitle::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border-subtle);
+  }
+
+  .payloads-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+  }
+
+  .payloadTile {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .payloadTile:hover, .payloadTile:focus {
+    background: var(--bg-card-hover);
+    border-color: var(--ps-cyan);
+    box-shadow: 0 4px 20px var(--ps-cyan-glow);
+    outline: none;
+    transform: translateY(-2px);
+  }
+
+  .payloadTile.primary {
+    border-color: rgba(56, 189, 248, 0.4);
+    background: rgba(16, 28, 54, 0.9);
+  }
+
+  .payloadTile.busy {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .tile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .tile-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .payloadTile .meta {
+    font-size: 11px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    padding: 2px 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    color: var(--ps-cyan);
+  }
+
+  .tile-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* Payload Status States */
+  .payloadTile[data-state="sending"] {
+    border-color: var(--ps-cyan);
+    background: rgba(0, 112, 209, 0.15);
+  }
+
+  .payloadTile[data-state="sending"] .tile-title::after {
+    content: " (SENDING...)";
+    font-size: 11px;
+    color: var(--ps-cyan);
+  }
+
+  .payloadTile[data-state="sent"] {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
+  }
+
+  .payloadTile[data-state="sent"] .tile-title::after {
+    content: " (READY)";
+    font-size: 11px;
+    color: var(--success);
+  }
+
+  .payloadTile[data-state="failed"] {
+    border-color: var(--danger);
+    background: rgba(244, 63, 94, 0.1);
+  }
+
+  .payloadTile[data-state="failed"] .tile-title::after {
+    content: " (FAILED)";
+    font-size: 11px;
+    color: var(--danger);
+  }
+
+  /* Diagnostics & Console */
+  .drawer-section {
+    margin-top: 24px;
+  }
+
+  .drawer-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .drawer-toggle:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+  }
+
+  #deepDrawer {
+    display: none;
+    margin-top: 12px;
+    padding: 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+  }
+
+  #deepDrawer.on {
+    display: block;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+  }
+
+  th {
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 8px;
+    text-align: left;
+    color: var(--text-muted);
+  }
+
+  td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 6px 8px;
+    color: var(--text-secondary);
+  }
+
+  .logs-container {
+    margin-top: 20px;
+    padding: 14px;
+    background: #04060a;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+  }
+
+  .logs-header {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  #scr, #early {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #64748b;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  #scr:not(:empty) {
+    color: #94a3b8;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  }
+
+  .legacy, #arm, #dt, #reactor {
+    display: none !important;
+  }
 </style>
 </head>
 <body class="quiet">
 <div id="deck">
-  <div id="failureMessage">UNLUCKY — REBOOT REQUIRED</div>
+  <!-- Brand Header -->
+  <div class="brand-header">
+    <div class="brand-left">
+      <img src="../evoX.W2JB.png" alt="evoX" class="brand-logo" onerror="this.style.display='none'">
+      <div>
+        <div class="brand-title">
+          <span>PS5 WebKit evoX W2JB</span>
+          <span class="brand-badge">vLite1</span>
+        </div>
+        <div class="brand-sub">Hôte d'exploitation expérimental &middot; Autoloader evoX</div>
+      </div>
+    </div>
+    <div id="top-bar-text" class="top-bar-badge">PS5 Standby</div>
+  </div>
+
+  <div id="failureMessage">UNLUCKY — REDÉMARRAGE DE LA CONSOLE REQUIS</div>
   <h1 class="legacy">poops</h1>
   <div id="reactor" class="reactor" hidden aria-hidden="true"></div>
   <div id="reboot"></div>
   <div id="verdict"></div>
   <div id="danger"></div>
+  
+  <!-- Active Stage Banner -->
   <div id="stage">starting…</div>
   <div id="liveStrip" aria-live="polite"></div>
-  <div class="stage-rail" id="stageRail" hidden>
-    <span class="stage-chip" data-chip="webkit">WebKit</span>
-    <span class="stage-chip" data-chip="rop">ROP</span>
-    <span class="stage-chip" data-chip="kernel">Kernel</span>
-    <span class="stage-chip" data-chip="elfldr">elfldr</span>
-    <span class="stage-chip" data-chip="evox">evox</span>
+  
+  <!-- Stage Pipeline Tracker -->
+  <div class="stage-rail" id="stageRail">
+    <span class="stage-chip" data-chip="webkit"><span class="chip-num">1</span>WebKit</span>
+    <span class="stage-chip" data-chip="rop"><span class="chip-num">2</span>ROP</span>
+    <span class="stage-chip" data-chip="kernel"><span class="chip-num">3</span>Kernel</span>
+    <span class="stage-chip" data-chip="elfldr"><span class="chip-num">4</span>elfldr</span>
+    <span class="stage-chip" data-chip="evox"><span class="chip-num">5</span>evoX</span>
   </div>
-  <div id="badge">ONLINE · PAYLOAD MANAGER</div>
+  
+  <div id="badge">ONLINE · GESTIONNAIRE DE PAYLOADS ACTIF</div>
   <div id="vitals"></div>
   <div id="cfg"></div>
-  <pre id="early"></pre>
-  <pre id="scr"></pre>
-  <button type="button" class="drawer-toggle" id="drawerToggle">LOG</button>
-  <div id="deepDrawer">
-    <div id="wrap">
-      <table>
-        <thead><tr><th>#</th><th>test</th><th>st</th><th>result</th></tr></thead>
-        <tbody id="rows"></tbody>
-      </table>
-    </div>
-    <div id="tally"></div>
-    <div id="summary"></div>
-  </div>
+  
+  <!-- Payloads Menu -->
   <div id="payloadMenu">
-    <div class="menuTitle">PAYLOADS</div>
-    <a class="payloadTile primary" href="#" data-name="evox.elf" data-key="evox"
-       data-state="default"><span>evox</span><span class="meta">auto</span></a>
-    <a class="payloadTile" href="#" data-name="ftpsrv-ps5.elf" data-key="ftp"
-       data-state="default"><span>FTP</span><span class="meta">aux</span></a>
-    <a class="payloadTile" href="#" data-name="gdbsrv-ps5.elf" data-key="gdb"
-       data-state="default"><span>GDB</span><span class="meta">aux</span></a>
-    <a class="payloadTile" href="#" data-name="klogsrv-ps5.elf" data-key="klog"
-       data-state="default"><span>Klog</span><span class="meta">aux</span></a>
-    <a class="payloadTile" href="#" data-name="shsrv-ps5.elf" data-key="shell"
-       data-state="default"><span>Shell</span><span class="meta">aux</span></a>
-    <a class="payloadTile" href="#" data-name="websrv-ps5.elf" data-key="web"
-       data-state="default"><span>Web</span><span class="meta">aux</span></a>
+    <div class="menuTitle">Gestionnaire de Payloads</div>
+    <div class="payloads-grid">
+      <a class="payloadTile primary" href="#" data-name="evox.elf" data-key="evox" data-state="default">
+        <div class="tile-header">
+          <span class="tile-title">evoX Autoloader</span>
+          <span class="meta">auto :9021</span>
+        </div>
+        <div class="tile-desc">Démon de chargement automatique & gestionnaire principal</div>
+      </a>
+      <a class="payloadTile" href="#" data-name="ftpsrv-ps5.elf" data-key="ftp" data-state="default">
+        <div class="tile-header">
+          <span class="tile-title">Serveur FTP</span>
+          <span class="meta">:1337</span>
+        </div>
+        <div class="tile-desc">Accès système de fichiers ultra-rapide & navigation de dossiers</div>
+      </a>
+      <a class="payloadTile" href="#" data-name="gdbsrv-ps5.elf" data-key="gdb" data-state="default">
+        <div class="tile-header">
+          <span class="tile-title">Serveur GDB</span>
+          <span class="meta">:2159</span>
+        </div>
+        <div class="tile-desc">Débogueur distant kernel et userland pour développeurs</div>
+      </a>
+      <a class="payloadTile" href="#" data-name="klogsrv-ps5.elf" data-key="klog" data-state="default">
+        <div class="tile-header">
+          <span class="tile-title">Kernel Logger</span>
+          <span class="meta">:3232</span>
+        </div>
+        <div class="tile-desc">Diffusion en temps réel des messages /dev/klog</div>
+      </a>
+      <a class="payloadTile" href="#" data-name="shsrv-ps5.elf" data-key="shell" data-state="default">
+        <div class="tile-header">
+          <span class="tile-title">Root Shell</span>
+          <span class="meta">:2323</span>
+        </div>
+        <div class="tile-desc">Session shell interactive root via TCP/Telnet</div>
+      </a>
+      <a class="payloadTile" href="#" data-name="websrv-ps5.elf" data-key="web" data-state="default">
+        <div class="tile-header">
+          <span class="tile-title">Serveur Web</span>
+          <span class="meta">:8080</span>
+        </div>
+        <div class="tile-desc">Interface d'administration HTTP embarquée</div>
+      </a>
+    </div>
   </div>
-  <button type="button" id="retryInject">RETRY evox INJECT</button>
+  
+  <button type="button" id="retryInject">RÉESSAYER L'INJECTION evoX</button>
+  
+  <!-- Diagnostics Drawer -->
+  <div class="drawer-section">
+    <button type="button" class="drawer-toggle" id="drawerToggle">JOURNAL SYSTÈME (DEEP LOG)</button>
+    <div id="deepDrawer">
+      <div id="wrap">
+        <table>
+          <thead><tr><th>#</th><th>test</th><th>st</th><th>result</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div id="tally"></div>
+      <div id="summary"></div>
+    </div>
+  </div>
+
+  <!-- Terminal Logs Output -->
+  <div class="logs-container">
+    <div class="logs-header">Console de Diagnostic</div>
+    <pre id="early"></pre>
+    <pre id="scr"></pre>
+  </div>
+  
   <div id="nav"></div>
   <div id="arm" hidden>Not armed. Redirecting…</div>
 </div>
