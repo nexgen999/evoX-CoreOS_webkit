@@ -4,7 +4,7 @@ if (!navigator.userAgent.includes('PlayStation 5')) {
 }
 
 const supportedFirmwares = [
-    "9.00", "9.20", "9.40", "9.60", "10.00", "10.01", "10.20",
+    "9.00", "9.05", "9.20", "9.40", "9.60", "10.00", "10.01", "10.20",
     "10.40", "10.60", "11.00", "11.20", "11.40", "11.60", "12.00"
 ];
 const fw_match = /PlayStation 5\/(\d+\.\d+)/.exec(navigator.userAgent);
