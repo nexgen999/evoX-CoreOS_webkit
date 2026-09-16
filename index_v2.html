@@ -453,55 +453,29 @@
     </a>
 
     <!-- Mode 2: Standard Autoload -->
-    <a href="slopkit/prospero.html?go=1&auto=1&trigger=netcontrol&payload=1&v=lite1" class="mode-card recommended" id="cardAuto">
+    <a href="slopkit/PS5_Unified_Autoloader.html?go=1&auto=1&trigger=netcontrol&payload=1&v=lite1" class="mode-card recommended" id="cardAuto">
       <div class="mode-top">
-        <div class="mode-name">1. Prospero Autoloader</div>
+        <div class="mode-name">2. PS5_Unified_Autoloader</div>
         <span class="mode-badge badge-cyan">Recommandé</span>
       </div>
       <div class="mode-desc">
-        La méthode classique et directe. Exécute l'exploit de bout en bout et injecte automatiquement le démon <strong>prospero.elf</strong> dès que elfldr est prêt.
+        La méthode classique et directe. Exécute l'exploit de bout en bout et injecte automatiquement le démon <strong>PS5_Unified_Autoloader.elf</strong> dès que elfldr est prêt.
       </div>
-      <div class="mode-pipeline">WebKit &rarr; ROP &rarr; Kernel &rarr; elfldr &rarr; prospero.elf</div>
-      <div class="mode-btn">Lancer en Mode Prospero &rarr;</div>
+      <div class="mode-pipeline">WebKit &rarr; ROP &rarr; Kernel &rarr; elfldr &rarr; PS5_Unified_Autoloader.elf</div>
+      <div class="mode-btn">Lancer en Mode PS5_Unified_Autoloader &rarr;</div>
     </a>
 
-    <!-- Mode 3: Preselect Target -->
-    <a href="slopkit/poops_preselect.html" class="mode-card" id="cardPreselect">
+    <!-- Mode 3: Standard Autoload -->
+    <a href="slopkit/poops_preselect.html?go=1&auto=1&trigger=netcontrol&payload=1&v=lite1" class="mode-card recommended" id="cardAuto">
       <div class="mode-top">
-        <div class="mode-name">3. Pré-sélection ELF</div>
+        <div class="mode-name">3. Payload Manager</div>
         <span class="mode-badge badge-purple">Personnalisé</span>
       </div>
       <div class="mode-desc">
-        Choisissez à l'avance le payload spécifique que vous souhaitez envoyer automatiquement à la fin (FTP direct, Root Shell direct, kstuff, etc.) sans injecter evoX.
+        La méthode classique et directe. Exécute l'exploit de bout en bout et injecte automatiquement le démon <strong>Ppldmgr.elf</strong> dès que elfldr est prêt.
       </div>
-      <div class="mode-pipeline">Pré-choix &rarr; Kernel &rarr; elfldr &rarr; [ELF Choisi]</div>
-      <div class="mode-btn outline">Configurer la Pré-sélection &rarr;</div>
-    </a>
-
-    <!-- Mode 4: Dedicated Loader (Post-Exploit) -->
-    <a href="slopkit/poops_loader.html" class="mode-card" id="cardLoader" style="border-color: rgba(16, 185, 129, 0.4);">
-      <div class="mode-top">
-        <div class="mode-name">4. ELF Loader Dédié</div>
-        <span class="mode-badge badge-emerald">Post-Exploit</span>
-      </div>
-      <div class="mode-desc">
-        elfldr est <strong>déjà actif</strong> en mémoire ? Injectez directement vos payloads ELF sans réexécuter l'exploit WebKit/ROP/Kernel (zéro risque de crash ou KP).
-      </div>
-      <div class="mode-pipeline">elfldr (:9020 / :9021) &rarr; Injection Directe (Sans Exploit)</div>
-      <div class="mode-btn outline" style="border-color: #10b981; color: #6ee7b7;">Ouvrir le Loader Dédié &rarr;</div>
-    </a>
-
-    <!-- Mode 5: Diagnostics / Debug -->
-    <a href="slopkit/poops.html?go=1&debug=1&payload=1" class="mode-card" id="cardDebug">
-      <div class="mode-top">
-        <div class="mode-name">5. Diagnostic / Debug</div>
-        <span class="mode-badge badge-slate">Développeurs</span>
-      </div>
-      <div class="mode-desc">
-        Démarre l'exploit avec la console de débogage ouverte, affichage complet des étapes ROP, fds ouverts et journalisation bas-niveau en temps réel.
-      </div>
-      <div class="mode-pipeline">Verbose Log &middot; Inspecteur ROP &middot; Deep Trace</div>
-      <div class="mode-btn outline">Ouvrir en Mode Debug &rarr;</div>
+      <div class="mode-pipeline">WebKit &rarr; ROP &rarr; Kernel &rarr; elfldr &rarr; pldmgr.elf</div>
+      <div class="mode-btn">Lancer en Mode pldmgr &rarr;</div>
     </a>
 
   </div>
