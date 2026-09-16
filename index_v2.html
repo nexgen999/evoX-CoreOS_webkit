@@ -504,6 +504,19 @@
       <div class="mode-btn outline">Ouvrir en Mode Debug &rarr;</div>
     </a>
 
+        <!-- Mode 6: Dedicated Loader (Post-Exploit) -->
+    <a href="slopkit/elf.html" class="mode-card" id="cardLoader" style="border-color: rgba(16, 185, 129, 0.4);">
+      <div class="mode-top">
+        <div class="mode-name">4. ELF Loader Dédié</div>
+        <span class="mode-badge badge-emerald">Post-Exploit</span>
+      </div>
+      <div class="mode-desc">
+        elfldr est <strong>déjà actif</strong> en mémoire ? Injectez directement vos payloads ELF sans réexécuter l'exploit WebKit/ROP/Kernel (zéro risque de crash ou KP).
+      </div>
+      <div class="mode-pipeline">elfldr (:9020 / :9021) &rarr; Injection Directe (Sans Exploit)</div>
+      <div class="mode-btn outline" style="border-color: #10b981; color: #6ee7b7;">Ouvrir le Loader Dédié &rarr;</div>
+    </a>
+
   </div>
 
   <!-- Port Mapping Info -->
